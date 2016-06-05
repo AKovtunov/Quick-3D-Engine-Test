@@ -8,7 +8,6 @@ require_relative 'patches.rb'
 require_relative 'camera.rb'
 require_relative 'character.rb'
 
-
 class Window < Gosu::Window
   attr_reader :camera
   def initialize

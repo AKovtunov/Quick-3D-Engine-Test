@@ -10,6 +10,7 @@ class Character
     @frame_duration = 150 # milliseconds
     @frame_tick = Gosu::milliseconds
     @left_foot = true # variable used to alternate between feet
+    @velocity = 0.9
     @frame_rect_width = 1.0 / @frame_count
     @frame_rect_width_pixel = @frames.width / @frame_count
     @frame_rect_height = 1.0 / @orientations.size
@@ -50,6 +51,26 @@ class Character
   def update
     @angles = @window.camera.angles
   end
+
+  def move_forward(velocity = @velocity)
+    @position.x -= velocity * Math::cos(@angles.y * $deg_to_rad)
+    @position.z -= velocity * Math::sin(@angles.y * $deg_to_rad)
+  end
+
+  def move_backwards(velocity = @velocity)
+    @position.x += velocity * Math::cos(@angles.y * $deg_to_rad)
+    @position.z += velocity * Math::sin(@angles.y * $deg_to_rad)
+  end
+
+  def move_left(velocity = @velocity)
+    @position.x -= velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
+    @position.z -= velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+  end
+
+  def move_right(velocity = @velocity)
+    @position.x += velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
+    @position.z += velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+  end
 end
 
 class PlayableCharacter < Character
@@ -74,50 +95,32 @@ class PlayableCharacter < Character
       @orientation = :E
     else
       is_moving = false
-    end
-
-    if !is_moving
       if @frame != 1
-          @frame = 1
-          update_vertex_array
+        @frame = 1
+        update_vertex_array
       end
       @frame_tick = Gosu::milliseconds
-    else
+    end
+
+    if is_moving
       # MOVEMENT
-      velocity = 0.8
       case @orientation
-      when :N
-        @position.x -= velocity * Math::cos(@angles.y * $deg_to_rad)
-        @position.z -= velocity * Math::sin(@angles.y * $deg_to_rad)
-      when :S
-        @position.x += velocity * Math::cos(@angles.y * $deg_to_rad)
-        @position.z += velocity * Math::sin(@angles.y * $deg_to_rad)
-      when :W
-        @position.x -= velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z -= velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
-      when :E
-        @position.x += velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z += velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+      when :N then move_forward
+      when :S then move_backwards
+      when :W then move_left
+      when :E then move_right
       when :NW
-        @position.x -= velocity * 0.7 * Math::cos(@angles.y * $deg_to_rad)
-        @position.z -= velocity * 0.7 * Math::sin(@angles.y * $deg_to_rad)
-        @position.x -= velocity * 0.7 * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z -= velocity * 0.7 * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+        move_forward(@velocity * 0.7)
+        move_left(@velocity * 0.7)
       when :NE
-        @position.x -= velocity * 0.7 * Math::cos(@angles.y * $deg_to_rad)
-        @position.z -= velocity * 0.7 * Math::sin(@angles.y * $deg_to_rad)
-        @position.x += velocity * 0.7 * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z += velocity * 0.7 * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+        move_forward(@velocity * 0.7)
+        move_right(@velocity * 0.7)
       when :SW
-        @position.x += velocity * 0.7 * Math::cos(@angles.y * $deg_to_rad)
-        @position.z += velocity * 0.7 * Math::sin(@angles.y * $deg_to_rad)
-        @position.x -= velocity * 0.7 * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z -= velocity * 0.7 * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+        move_backwards(@velocity * 0.7)
+        move_left(@velocity * 0.7)
       when :SE
-        @position.x += velocity * 0.7 * Math::cos(@angles.y * $deg_to_rad)
-        @position.z += velocity * 0.7 * Math::sin(@angles.y * $deg_to_rad)
-        @position.x += velocity * 0.7 * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-        @position.z += velocity * 0.7 * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+        move_backwards(@velocity * 0.7)
+        move_right(@velocity * 0.7)
       end
 
       # ANIMATION

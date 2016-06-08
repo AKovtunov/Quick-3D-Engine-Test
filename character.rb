@@ -16,7 +16,7 @@ class Character
     @frame_rect_height = 1.0 / @orientations.size
     @frame_rect_height_pixel = @frames.height / @orientations.size
     @position = Vector3.new(0, 0, 0)
-    @angles = Vector3.new(0, 0, 0)
+    @angles = Vector3.new(0.0, 0.0, 0.0)
     update_vertex_array
   end
 
@@ -41,6 +41,7 @@ class Character
       glPushMatrix
         glTranslate(@position.x, @position.y, @position.z)
         glRotate(90.0 - @angles.y, 0, 1, 0)
+        glRotate(-@angles.x, 1, 0, 0)
     		glVertexPointer(3, GL_FLOAT, 0, @v)
     		glTexCoordPointer(2, GL_FLOAT, 0, @vt)
     		glDrawArrays(GL_TRIANGLE_FAN, 0, @v.size / 3)
@@ -53,23 +54,23 @@ class Character
   end
 
   def move_forward(velocity = @velocity)
-    @position.x -= velocity * Math::cos(@angles.y * $deg_to_rad)
-    @position.z -= velocity * Math::sin(@angles.y * $deg_to_rad)
+    @position.x -= velocity * Math::cos(@angles.y.to_rad)
+    @position.z -= velocity * Math::sin(@angles.y.to_rad)
   end
 
   def move_backwards(velocity = @velocity)
-    @position.x += velocity * Math::cos(@angles.y * $deg_to_rad)
-    @position.z += velocity * Math::sin(@angles.y * $deg_to_rad)
+    @position.x += velocity * Math::cos(@angles.y.to_rad)
+    @position.z += velocity * Math::sin(@angles.y.to_rad)
   end
 
   def move_left(velocity = @velocity)
-    @position.x -= velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-    @position.z -= velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+    @position.x -= velocity * Math::cos((@angles.y - 90.0).to_rad)
+    @position.z -= velocity * Math::sin((@angles.y - 90.0).to_rad)
   end
 
   def move_right(velocity = @velocity)
-    @position.x += velocity * Math::cos((@angles.y - 90.0) * $deg_to_rad)
-    @position.z += velocity * Math::sin((@angles.y - 90.0) * $deg_to_rad)
+    @position.x += velocity * Math::cos((@angles.y - 90.0).to_rad)
+    @position.z += velocity * Math::sin((@angles.y - 90.0).to_rad)
   end
 end
 
@@ -77,13 +78,13 @@ class PlayableCharacter < Character
   def update
     super
     is_moving = true
-    if Gosu::button_down?($keys[:move_forward]) and Gosu::button_down?($keys[:move_left])
+    if [:move_forward, :move_left].all? {|key| Gosu.button_down?($keys[key])}
       @orientation = :NW
-    elsif Gosu::button_down?($keys[:move_forward]) and Gosu::button_down?($keys[:move_right])
+    elsif [:move_forward, :move_right].all? {|key| Gosu.button_down?($keys[key])}
       @orientation = :NE
-    elsif Gosu::button_down?($keys[:move_backwards]) and Gosu::button_down?($keys[:move_left])
+    elsif [:move_backwards, :move_left].all? {|key| Gosu.button_down?($keys[key])}
       @orientation = :SW
-    elsif Gosu::button_down?($keys[:move_backwards]) and Gosu::button_down?($keys[:move_right])
+    elsif [:move_backwards, :move_right].all? {|key| Gosu.button_down?($keys[key])}
       @orientation = :SE
     elsif Gosu::button_down?($keys[:move_backwards])
       @orientation = :S
@@ -99,7 +100,6 @@ class PlayableCharacter < Character
         @frame = 1
         update_vertex_array
       end
-      @frame_tick = Gosu::milliseconds
     end
 
     if is_moving

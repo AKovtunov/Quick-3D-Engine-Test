@@ -24,6 +24,7 @@ class Window < Gosu::Window
 
   def button_down(id)
     exit if id == Gosu::KbEscape
+    @camera.read_setup_file if id == Gosu::KbF5
   end
 
   def update

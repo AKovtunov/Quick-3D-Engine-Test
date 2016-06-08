@@ -1,11 +1,6 @@
 require 'scanf'
 
-class Vector3
-  attr_accessor :x, :y, :z
-  def initialize(x = 0.0, y = 0.0, z = 0.0)
-    @x, @y, @z = x, y, z
-  end
-end
+Vector3 = Struct.new(:x, :y, :z)
 
 class GLTexture
 	attr_reader :width, :height
@@ -82,4 +77,8 @@ $keys = {
   :move_right => Gosu::KbD
 }
 
-$deg_to_rad = Math::PI / 180.0
+class Float
+  def to_rad
+    self * Math::PI / 180.0
+  end
+end

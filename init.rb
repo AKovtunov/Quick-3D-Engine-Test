@@ -12,7 +12,7 @@ class Window < Gosu::Window
   attr_reader :camera
   def initialize
     super(640, 480, false)
-    self.caption = "another 3D engine"
+    self.caption = "Simple 3D engine"
     @character = PlayableCharacter.new(self, 'chara_1')
     @camera = Camera.new(self)
     @camera.set_target(@character.position)

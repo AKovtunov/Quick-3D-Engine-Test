@@ -44,6 +44,7 @@ class Character
         glRotate(-@angles.x, 1, 0, 0)
     		glVertexPointer(3, GL_FLOAT, 0, @v)
     		glTexCoordPointer(2, GL_FLOAT, 0, @vt)
+        glNormalPointer(GL_FLOAT, 0, [])
     		glDrawArrays(GL_TRIANGLE_FAN, 0, @v.size / 3)
       glPopMatrix
     glDisable(GL_ALPHA_TEST)
